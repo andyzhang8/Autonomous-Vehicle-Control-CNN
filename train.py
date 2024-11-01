@@ -1,14 +1,17 @@
-# train.py
 import torch
 import torch.optim as optim
 from carla_env import CarlaEnv
 from replay_buffer import ReplayBuffer
 from model import Actor, Critic
+import matplotlib.pyplot as plt
+from torch.utils.tensorboard import SummaryWriter
+
 
 # Check if GPU is available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
+# Parameters
 gamma = 0.99
 batch_size = 64
 tau = 0.001
@@ -21,6 +24,11 @@ critic_target = Critic().to(device)
 actor_optimizer = optim.Adam(actor.parameters(), lr=1e-4)
 critic_optimizer = optim.Adam(critic.parameters(), lr=1e-3)
 replay_buffer = ReplayBuffer()
+writer = SummaryWriter("runs/Carla_Training")
+
+log_file = open("training_log.txt", "w")
+
+episode_rewards = []
 
 for episode in range(1000):
     state = env.reset()
@@ -32,8 +40,11 @@ for episode in range(1000):
         # Actor forward pass
         steering, throttle = actor(state_tensor)
         action = torch.cat([steering, throttle], dim=1).detach().cpu().numpy().squeeze()  # Move to CPU for env step
-        
+
         next_state, reward, done, _ = env.step(action)
+        env.render(steering.item(), throttle.item())  # Pass action values for display
+
+        # Store experience in replay buffer
         replay_buffer.add(state, action, reward, next_state, done)
 
         if len(replay_buffer) > batch_size:
@@ -71,4 +82,26 @@ for episode in range(1000):
         state = next_state
         state_tensor = torch.FloatTensor(state).unsqueeze(0).to(device)
 
-    print(f"Episode {episode}, Reward: {episode_reward}")
+    episode_rewards.append(episode_reward)
+    writer.add_scalar("Reward/Episode", episode_reward, episode)
+
+    log_message = f"Episode {episode}, Reward: {episode_reward}\n"
+    print(log_message.strip())
+    log_file.write(log_message)
+
+    
+
+plt.plot(episode_rewards)
+plt.xlabel("Episode")
+plt.ylabel("Cumulative Reward")
+plt.title("Training Progress")
+plt.show()
+
+torch.save(actor.state_dict(), "actor_model.pth")
+torch.save(critic.state_dict(), "critic_model.pth")
+print("Models saved: actor_model.pth and critic_model.pth")
+
+log_file.close()
+
+writer.close()
+

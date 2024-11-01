@@ -1,4 +1,3 @@
-# carla_env.py
 import carla
 import numpy as np
 import random
@@ -59,25 +58,30 @@ class CarlaEnv:
         control = carla.VehicleControl(throttle=float(throttle), steer=float(steering))
         self.vehicle.apply_control(control)
 
-        # Calculate reward and done status
         reward = self.get_reward()
         done = self.check_done()
         return self.image, reward, done, {}
 
     def get_reward(self):
-        # Give a positive reward for speed and penalize for collision
+        # Reward speed and penalize collision
         velocity = self.vehicle.get_velocity()
         speed = np.linalg.norm([velocity.x, velocity.y, velocity.z])
         reward = speed if not self.collision_occurred else -10
         return reward
 
     def check_done(self):
-        # End episode if collision has occurred
         return self.collision_occurred
 
-    def render(self):
+    def render(self, steering=None, throttle=None):
         if self.image is not None:
-            cv2.imshow("CARLA", self.image)
+            frame = self.image.copy()
+            # Display steering and throttle values on the frame
+            if steering is not None and throttle is not None:
+                cv2.putText(frame, f"Steering: {steering:.2f}", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+                cv2.putText(frame, f"Throttle: {throttle:.2f}", (10, 60),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+            cv2.imshow("CARLA", frame)
             cv2.waitKey(1)
 
     def close(self):
