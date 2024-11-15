@@ -13,24 +13,24 @@ Implements efficient experience replay and target network updates for reinforcem
 Setup
 Clone this repository:
 ##
-		git clone https://github.com/your-username/carla-actor-critic.git
+	git clone https://github.com/your-username/carla-actor-critic.git
 ##
-		cd carla-actor-critic
+	cd carla-actor-critic
 
 Install the dependencies:
 ##
-		pip install -r requirements.txt
+	pip install -r requirements.txt
 
 Download the CARLA simulator if you don’t have it already
 https://carla.readthedocs.io/en/latest/start_quickstart/
 
 Start the CARLA server:
 ##
-		./CarlaUE4.sh
+	./CarlaUE4.sh
 
 Train the agent:
 ##
-		python run.py
+	python run.py
 How it Works
 Image Processing:
 The agent gets a semantic_image (RGB camera feed from CARLA) as input.
