@@ -1,4 +1,4 @@
-This project applies Actor-Critic reinforcement learning to train an autonomous driving agent in the CARLA simulator. The system integrates convolutional neural networks (CNNs) for image processing, a replay buffer for efficient training, and a custom Gym-compatible CARLA environment to navigate complex simulation scenarios.
+This project applies Actor-Critic reinforcement learning to train an autonomous driving agent in the CARLA simulator. The system integrates convolutional neural networks (CNNs) for image processing, a replay buffer for efficient training, and a custom Gym-compatible CARLA environment to navigate complex simulation scenarios. The model is designed to enhance vehicle safety by enabling real-time decision-making and dynamic control in complex driving environments.
 
 # What This Does
 ## Reinforcement Learning with Real-Time Visual Input:
